@@ -670,15 +670,6 @@ These screenshots show:
 - [ ] Final testing
 - [ ] Final GitHub push
 
----
-
-## Suggested Git Commit for README Polish
-
-```bash
-git add README.md
-git commit -m "Polish README after Day 1 setup verification"
-git push
-```
 
 ---
 
