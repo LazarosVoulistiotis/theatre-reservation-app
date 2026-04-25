@@ -2,41 +2,103 @@
 
 A three-tier mobile distributed system for booking seats in theatre performances.
 
-This project is developed for **CN6035 — Mobile & Distributed Systems**. It demonstrates a distributed architecture where a React Native mobile client communicates with a Node.js/Express REST API, which stores and retrieves data from a MariaDB database.
+This project is developed for **CN6035 — Mobile & Distributed Systems**. It demonstrates a distributed architecture where a **React Native mobile client** communicates with a **Node.js/Express REST API**, which stores and retrieves data from a **MariaDB relational database**.
 
 ---
 
 ## Project Overview
 
-The **Theatre Reservation App** allows users to:
+The **Theatre Reservation App** allows users to browse theatre performances, view available showtimes, select specific seats, and manage their reservations through a mobile application.
 
-- register and log in securely,
-- browse theatres and theatre performances,
-- search by show title, theatre name or location,
-- view available showtimes,
-- select specific seats,
-- create reservations,
-- view their reservation history,
-- edit or cancel future reservations.
+The system is designed around a realistic theatre booking workflow:
 
-The main technical focus of the project is not only basic reservation creation, but also **seat availability management** and **double-booking prevention**.
+- users register and log in securely,
+- users browse theatres and performances,
+- users search by show title, theatre name or location,
+- users view available showtimes,
+- users select specific seats,
+- users create reservations,
+- users view their reservation history,
+- users edit or cancel future reservations.
+
+The main technical focus is not only basic reservation creation, but also **seat availability management**, **reservation consistency**, and **double-booking prevention**.
 
 ---
 
 ## Coursework Alignment
 
-The system is designed to meet the main coursework requirements:
+The project is aligned with the CN6035 coursework requirements and assessment criteria.
 
-| Requirement Area | Implementation Direction |
-|---|---|
-| Mobile Frontend | React Native / Expo application |
-| Backend API | Node.js and Express REST API |
-| Database | MariaDB relational database |
-| Authentication | JWT-based authentication |
-| Distributed System | Mobile client → REST API → Database |
-| Reservation Management | Create, view, edit and cancel reservations |
-| Data Consistency | Seat availability checks and double-booking prevention |
-| Documentation | README, diagrams, screenshots and presentation material |
+| Assessment Area | Weight | Project Evidence |
+|---|---:|---|
+| Frontend | 30% | React Native / Expo mobile application with clear UI, backend communication, feedback states and reservation flow |
+| Backend | 20% | Node.js / Express REST API with routes, controllers, services, middleware, JWT authentication and MariaDB integration |
+| Database | 20% | MariaDB schema with normalized tables, primary keys, foreign keys, indexes and reservation constraints |
+| Presentation | 30% | README, architecture evidence, screenshots, PowerPoint and live demo flow |
+
+The project follows the required distributed system model:
+
+```text
+React Native Mobile Client
+        ↓
+Node.js / Express REST API
+        ↓
+MariaDB Database
+```
+
+---
+
+## Key Features
+
+### Implemented in Day 1
+
+- Project repository and folder structure
+- Backend scaffold with Express
+- Environment configuration example
+- MariaDB connection pool
+- Health endpoint
+- Database connectivity endpoint
+- MariaDB schema
+- Seed data
+- Architecture draft
+- Initial documentation
+- Day 1 backend and database evidence screenshots
+
+### Planned for Day 2
+
+- User registration
+- User login
+- JWT authentication middleware
+- Theatre, show, showtime and seat endpoints
+- Reservation creation
+- User reservation history
+- Future reservation editing
+- Future reservation cancellation
+- Backend transaction logic
+- Double-booking rejection test
+
+### Planned for Day 3
+
+- React Native / Expo frontend
+- Authentication flow
+- Secure token storage
+- Show listing and search
+- Show details
+- Showtime selection
+- Seat selection
+- Reservation confirmation
+- My Reservations screen
+
+### Planned for Day 4
+
+- Final README polish
+- Architecture diagram
+- ERD
+- Backend screenshots
+- Frontend screenshots
+- PowerPoint presentation
+- Demo script
+- Final testing and submission preparation
 
 ---
 
@@ -75,16 +137,16 @@ The system is designed to meet the main coursework requirements:
 ### Development Tools
 
 - WebStorm or Visual Studio Code
+- HeidiSQL / MariaDB client
 - Postman
 - Git
 - GitHub
-- MariaDB client / terminal
 
 ---
 
 ## System Architecture
 
-The application follows a three-tier architecture:
+The application follows a three-tier architecture.
 
 ```text
 React Native Mobile Client
@@ -104,7 +166,7 @@ The frontend provides the mobile user interface for:
 
 - registration,
 - login,
-- show browsing,
+- theatre and show browsing,
 - search,
 - showtime selection,
 - seat selection,
@@ -134,7 +196,7 @@ db/
 utils/
 ```
 
-This separation supports clean architecture and aligns with the backend architecture requirement of the coursework.
+This separation supports clean architecture and directly aligns with the backend architecture criterion of the coursework.
 
 ### Database Layer
 
@@ -220,8 +282,25 @@ The database schema is designed around real theatre seat reservations.
 - One theatre can host many shows.
 - One show can have many showtimes.
 - One hall has many seats.
-- One reservation belongs to one user and one showtime.
+- One reservation belongs to one user.
+- One reservation belongs to one showtime.
 - One reservation can contain one or more selected seats.
+- One selected seat belongs to one reservation and one showtime.
+
+### Seed Data
+
+The Day 1 seed data creates:
+
+| Entity | Count |
+|---|---:|
+| Theatres | 3 |
+| Halls | 6 |
+| Shows | 6 |
+| Showtimes | 7 |
+| Seat categories | 3 |
+| Seats | 105 |
+
+This gives the project enough realistic demo data for backend testing, frontend development and presentation screenshots.
 
 ---
 
@@ -242,18 +321,54 @@ The backend will also validate seat availability in the service layer before ins
 1. **Application-level validation** in the backend service logic.
 2. **Database-level protection** through the unique constraint.
 
-This is important for a distributed reservation system because two users may attempt to reserve the same seat at nearly the same time.
+This is important for a distributed reservation system because two users may attempt to reserve the same seat at nearly the same time. The database constraint acts as the final consistency safeguard.
+
+---
+
+## Current API Endpoints
+
+The Day 1 backend scaffold currently supports:
+
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | `/health` | Confirms that the API server is running |
+| GET | `/db-test` | Confirms database connectivity |
+
+### Health Check Example
+
+```text
+GET http://localhost:5000/health
+```
+
+Expected response:
+
+```json
+{
+  "status": "ok",
+  "message": "Theatre Reservation API is running"
+}
+```
+
+### Database Test Example
+
+```text
+GET http://localhost:5000/db-test
+```
+
+Expected response:
+
+```json
+{
+  "status": "ok",
+  "database": {
+    "db_status": 1
+  }
+}
+```
 
 ---
 
 ## Planned API Endpoints
-
-### Health and Database
-
-| Method | Endpoint | Description |
-|---|---|---|
-| GET | `/health` | Checks if the API is running |
-| GET | `/db-test` | Checks database connectivity |
 
 ### Authentication
 
@@ -292,7 +407,7 @@ Protected requests must include:
 Authorization: Bearer <token>
 ```
 
-Protected endpoints include:
+Protected endpoints will include:
 
 ```text
 POST /reservations
@@ -301,7 +416,7 @@ PUT /reservations/:id
 DELETE /reservations/:id
 ```
 
-Passwords are stored using bcrypt hashing. The frontend will store the JWT token securely using Expo SecureStore.
+Passwords will be stored using bcrypt hashing. The frontend will store the JWT token securely using Expo SecureStore.
 
 ---
 
@@ -325,15 +440,6 @@ Test the health endpoint:
 
 ```text
 GET http://localhost:5000/health
-```
-
-Expected response:
-
-```json
-{
-  "status": "ok",
-  "message": "Theatre Reservation API is running"
-}
 ```
 
 ---
@@ -392,17 +498,6 @@ After the database is created, test the API endpoint:
 GET http://localhost:5000/db-test
 ```
 
-Expected response:
-
-```json
-{
-  "status": "ok",
-  "database": {
-    "db_status": 1
-  }
-}
-```
-
 ---
 
 ## Planned Frontend Screens
@@ -426,7 +521,7 @@ The frontend will provide loading states, success messages, error messages and e
 
 The backend will be tested using Postman.
 
-Important test cases:
+Important Day 2 backend test cases:
 
 - API health check
 - Database connection check
@@ -452,18 +547,34 @@ The most important evidence screenshot will be the double-booking rejection, bec
 
 ## Screenshots and Evidence
 
-Screenshots will be stored under:
+Screenshots are stored under:
 
 ```text
 docs/screenshots/backend/
 docs/screenshots/frontend/
 ```
 
-Planned backend screenshots:
+### Day 1 Evidence
+
+Current Day 1 evidence screenshots:
 
 ```text
-01_health_success.png
-02_db_test_success.png
+01_day1_health_success.png
+02_day1_db_test_success.png
+03_day1_database_seeded_tables.png
+04_day1_reservation_seats_indexes.png
+```
+
+These screenshots show:
+
+- successful API health check,
+- successful database connection,
+- seeded MariaDB tables,
+- `uq_showtime_seat` index for double-booking prevention.
+
+### Planned Backend Screenshots
+
+```text
 03_register_success.png
 04_duplicate_email_error.png
 05_login_success.png
@@ -479,7 +590,7 @@ Planned backend screenshots:
 15_no_token_unauthorized.png
 ```
 
-Planned frontend screenshots:
+### Planned Frontend Screenshots
 
 ```text
 01_welcome.png
@@ -502,12 +613,20 @@ Planned frontend screenshots:
 
 ### Day 1 — Analysis, Architecture, Database and Scaffold
 
-- [x] Repository structure planned
-- [x] Backend scaffold planned
-- [x] Database schema designed
-- [x] Seed data planned
-- [x] Architecture draft planned
-- [x] Initial README created
+- [x] GitHub repository created
+- [x] Project structure completed
+- [x] Backend scaffold completed
+- [x] Express server running
+- [x] `/health` endpoint tested successfully
+- [x] `/db-test` endpoint tested successfully
+- [x] MariaDB database created
+- [x] Database schema implemented
+- [x] Seed data inserted and verified
+- [x] Double-booking prevention index verified
+- [x] Architecture draft completed
+- [x] Initial README created and polished
+- [x] Day 1 evidence screenshots captured
+- [x] Initial commit pushed to GitHub
 
 ### Day 2 — Backend API and Reservation Logic
 
@@ -515,14 +634,15 @@ Planned frontend screenshots:
 - [ ] Login endpoint
 - [ ] JWT middleware
 - [ ] Theatres endpoint
-- [ ] Shows endpoint
+- [ ] Shows endpoint with filters
 - [ ] Showtimes endpoint
 - [ ] Seats availability endpoint
 - [ ] Create reservation endpoint
 - [ ] User reservations endpoint
-- [ ] Edit reservation endpoint
-- [ ] Cancel reservation endpoint
-- [ ] Double-booking prevention logic
+- [ ] Edit future reservation endpoint
+- [ ] Cancel future reservation endpoint
+- [ ] Transaction-based reservation logic
+- [ ] Double-booking rejection test
 
 ### Day 3 — React Native Frontend
 
@@ -552,11 +672,11 @@ Planned frontend screenshots:
 
 ---
 
-## Suggested Git Commit for Day 1
+## Suggested Git Commit for README Polish
 
 ```bash
-git add .
-git commit -m "Initialize theatre reservation architecture and database schema"
+git add README.md
+git commit -m "Polish README after Day 1 setup verification"
 git push
 ```
 
