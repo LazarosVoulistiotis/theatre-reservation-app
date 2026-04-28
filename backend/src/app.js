@@ -4,6 +4,11 @@ const express = require("express");
 const cors = require("cors");
 const pool = require("./db/pool");
 
+const authRoutes = require("./routes/authRoutes");
+const catalogRoutes = require("./routes/catalogRoutes");
+const reservationRoutes = require("./routes/reservationRoutes");
+const errorHandler = require("./middleware/errorHandler");
+
 const app = express();
 
 app.use(cors());
@@ -19,6 +24,7 @@ app.get("/health", (req, res) => {
 app.get("/db-test", async (req, res, next) => {
   try {
     const [rows] = await pool.query("SELECT 1 AS db_status");
+
     res.json({
       status: "ok",
       database: rows[0]
@@ -28,18 +34,16 @@ app.get("/db-test", async (req, res, next) => {
   }
 });
 
+app.use("/", authRoutes);
+app.use("/", catalogRoutes);
+app.use("/", reservationRoutes);
+
 app.use((req, res) => {
   res.status(404).json({
     message: "Route not found"
   });
 });
 
-app.use((err, req, res, next) => {
-  console.error(err);
-
-  res.status(err.status || 500).json({
-    message: err.message || "Internal server error"
-  });
-});
+app.use(errorHandler);
 
 module.exports = app;
