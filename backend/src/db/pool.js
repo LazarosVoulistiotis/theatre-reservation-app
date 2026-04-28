@@ -1,3 +1,5 @@
+// Το pool.js είναι υπεύθυνο για τη σύνδεση του Node.js backend με τη MariaDB.
+
 const mysql = require("mysql2/promise");
 
 const pool = mysql.createPool({

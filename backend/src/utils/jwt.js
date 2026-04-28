@@ -1,3 +1,6 @@
+// Handles JWT token generation for authenticated users.
+// The token contains only the minimum user identity data required by protected routes.
+
 const jwt = require("jsonwebtoken");
 
 function signToken(user) {

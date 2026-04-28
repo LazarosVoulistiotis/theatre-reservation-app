@@ -1,8 +1,12 @@
+// Contains authentication business logic.
+// This service validates input, hashes passwords, checks credentials, and generates JWT tokens.
+
 const bcrypt = require("bcrypt");
 const pool = require("../db/pool");
 const createHttpError = require("../utils/httpError");
 const { signToken } = require("../utils/jwt");
 
+// Validates registration data before interacting with the database.
 function validateRegisterInput(name, email, password) {
     if (!name || !email || !password) {
         throw createHttpError(400, "Name, email and password are required.");
@@ -17,15 +21,18 @@ function validateRegisterInput(name, email, password) {
     }
 }
 
+// Validates login data before checking user credentials.
 function validateLoginInput(email, password) {
     if (!email || !password) {
         throw createHttpError(400, "Email and password are required.");
     }
 }
 
+// Registers a new user after validation, duplicate email checking, and password hashing.
 async function registerUser({ name, email, password }) {
     validateRegisterInput(name, email, password);
 
+    // Normalizes email to avoid duplicate accounts with different letter casing.
     const normalizedEmail = email.trim().toLowerCase();
 
     const [existingUsers] = await pool.query(
@@ -37,16 +44,18 @@ async function registerUser({ name, email, password }) {
         throw createHttpError(409, "Email is already registered.");
     }
 
+    // Passwords are never stored as plain text.
     const passwordHash = await bcrypt.hash(password, 10);
 
     const [result] = await pool.query(
         `
-    INSERT INTO users (name, email, password_hash)
-    VALUES (?, ?, ?)
-    `,
+        INSERT INTO users (name, email, password_hash)
+        VALUES (?, ?, ?)
+        `,
         [name.trim(), normalizedEmail, passwordHash]
     );
 
+    // Returns only safe user data, not the password hash.
     return {
         user_id: result.insertId,
         name: name.trim(),
@@ -54,6 +63,7 @@ async function registerUser({ name, email, password }) {
     };
 }
 
+// Authenticates a user and returns a signed JWT token.
 async function loginUser({ email, password }) {
     validateLoginInput(email, password);
 
@@ -61,10 +71,10 @@ async function loginUser({ email, password }) {
 
     const [users] = await pool.query(
         `
-    SELECT user_id, name, email, password_hash
-    FROM users
-    WHERE email = ?
-    `,
+            SELECT user_id, name, email, password_hash
+            FROM users
+            WHERE email = ?
+        `,
         [normalizedEmail]
     );
 
@@ -74,12 +84,14 @@ async function loginUser({ email, password }) {
 
     const user = users[0];
 
+    // Compares the submitted password with the stored bcrypt hash.
     const passwordMatches = await bcrypt.compare(password, user.password_hash);
 
     if (!passwordMatches) {
         throw createHttpError(401, "Invalid email or password.");
     }
 
+    // Creates a JWT token used by protected routes.
     const token = signToken(user);
 
     return {
