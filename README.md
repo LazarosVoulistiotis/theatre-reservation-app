@@ -8,21 +8,22 @@ This project is developed for **CN6035 — Mobile & Distributed Systems**. It de
 
 ## Project Overview
 
-The **Theatre Reservation App** allows users to browse theatre performances, view available showtimes, select specific seats, and manage their reservations through a mobile application.
+The **Theatre Reservation App** allows users to browse theatre performances, view available showtimes, select specific seats, and manage their reservations through a mobile-first application.
 
-The system is designed around a realistic theatre booking workflow:
+The system implements a realistic theatre booking workflow:
 
 - users register and log in securely,
-- users browse theatres and performances,
-- users search by show title, theatre name, location, and date,
-- users view available showtimes,
+- users browse available theatres and performances,
+- users search by show title, theatre name, location, and show date,
+- users view show details and available showtimes,
 - users view seat availability for a selected showtime,
 - users select one or more specific seats,
 - users create reservations,
 - users view their own reservation history,
-- users edit or cancel future reservations.
+- users edit future reservations,
+- users cancel future reservations.
 
-The main technical focus is not only basic reservation CRUD, but also **seat availability management**, **reservation consistency**, **JWT-protected access**, and **double-booking prevention**.
+The main technical focus is not only basic CRUD functionality, but also **JWT-protected access**, **secure token handling**, **seat availability management**, **reservation consistency**, and **double-booking prevention**.
 
 ---
 
@@ -32,15 +33,15 @@ The project is aligned with the CN6035 coursework requirements and assessment cr
 
 | Assessment Area | Weight | Project Evidence |
 |---|---:|---|
-| Frontend | 30% | React Native / Expo mobile application with clean UI, backend communication, feedback states, search, seat selection, and reservation flow |
-| Backend | 20% | Node.js / Express REST API with routes, controllers, services, middleware, JWT authentication, validation, and MariaDB integration |
-| Database | 20% | MariaDB schema with normalized tables, primary keys, foreign keys, indexes, and reservation constraints |
+| Frontend | 30% | React Native / Expo mobile client with consistent UI, authentication flow, protected navigation, backend communication, search, show details, showtime preview, seat selection, reservation creation, edit/cancel reservation flow, and user feedback states |
+| Backend | 20% | Node.js / Express REST API with routes, controllers, services, middleware, JWT authentication, validation, transaction-based reservation logic, and MariaDB integration |
+| Database | 20% | MariaDB schema with normalized tables, primary keys, foreign keys, indexes, constraints, seed data, and reservation-seat relationship for consistency |
 | Presentation | 30% | README, architecture evidence, backend/frontend screenshots, Postman evidence, PowerPoint, and live demo flow |
 
 The project follows the required distributed system model:
 
 ```text
-React Native Mobile Client
+React Native / Expo Mobile Client
         ↓
 Node.js / Express REST API
         ↓
@@ -51,66 +52,62 @@ MariaDB Database
 
 ## Key Features
 
-### Implemented in Day 1
+### Authentication and User Access
 
-- Project repository and folder structure
-- Backend scaffold with Express
-- Environment configuration example
-- MariaDB connection pool
-- Health endpoint
-- Database connectivity endpoint
-- MariaDB schema
-- Seed data
-- Architecture draft
-- Initial documentation
-- Day 1 backend and database evidence screenshots
+- User registration with name, email, and password
+- User login with email and password
+- Password hashing with bcrypt on the backend
+- JWT-based authentication for protected routes
+- Protected frontend navigation after login
+- Secure frontend token handling through the authentication context
+- Logout functionality
+- User feedback for validation, success, and error cases
 
-### Implemented in Day 2
+### Theatre Catalogue and Search
 
-- User registration endpoint
-- User login endpoint
-- Input validation for authentication requests
-- Duplicate email rejection
-- Password hashing with bcrypt
-- JWT token generation
-- JWT authentication middleware
-- Protected reservation endpoints
-- Public theatre listing endpoint
-- Public show listing endpoint with filters
-- Public showtime listing endpoint
-- Public seat availability endpoint
-- Reservation creation with selected seats
-- User reservation history endpoint
-- Future reservation editing endpoint
-- Future reservation cancellation endpoint
-- Transaction-based reservation creation and editing
-- Double-booking prevention through backend validation and database constraints
-- Clean JSON error handling
-- Full backend testing with Postman
+- List of available theatre performances loaded from the backend
+- Search by show title, theatre name, location, and show date
+- Empty-state UI when no results are found
+- Loading and error states during backend communication
+- Consistent show cards with title, theatre, location, duration, age rating, and description
 
-### Planned for Day 3
+### Show Details and Availability
 
-- React Native / Expo frontend
-- Authentication flow
-- Secure token storage using Expo SecureStore
-- Show listing and search
-- Show details screen
-- Showtime selection
-- Seat selection
-- Reservation confirmation
-- My Reservations screen
-- Edit/cancel reservation flow from the mobile UI
+- Dedicated show details screen
+- Display of title, theatre, location, description, duration, and age rating
+- Preview of available showtimes before seat selection
+- Display of showtime date/time, hall name, and starting price
+- Direct navigation to the complete seat selection flow
 
-### Planned for Day 4
+### Seat Selection and Reservation Creation
 
-- Final README polish
-- Architecture diagram
-- Database ERD
-- Backend screenshots review
-- Frontend screenshots
-- PowerPoint presentation
-- Demo script
-- Final regression testing and submission preparation
+- Showtimes loaded from the backend
+- Seats loaded per selected showtime
+- Seat availability displayed visually
+- Unavailable seats disabled
+- Selected seats highlighted
+- Live total price calculation
+- Create reservation request sent to the backend
+- Success feedback after booking
+- Seat availability refreshed after reservation creation
+
+### User Reservation Management
+
+- My Reservations screen for the authenticated user
+- Upcoming reservations section
+- Past / cancelled reservations section
+- Reservation details: title, theatre, location, date/time, seats, total price, status, and type
+- Edit future reservation flow
+- Cancel future reservation flow
+- Confirmation dialog before cancellation
+- Cancelled reservations retained in history
+
+### Consistency and Double-Booking Protection
+
+- Seat availability checked before reservation creation and editing
+- Backend transaction logic protects reservation operations
+- Database-level unique constraint prevents the same seat from being confirmed twice for the same showtime
+- Cancelled reservations release seats because availability checks only consider confirmed reservations
 
 ---
 
@@ -123,7 +120,8 @@ MariaDB Database
 - JavaScript
 - Axios
 - React Navigation
-- Expo SecureStore for secure token storage
+- Expo SecureStore / frontend authentication context for token persistence
+- Reusable UI components: `AppButton`, `AppInput`, `FeedbackMessage`, `LoadingView`
 
 ### Backend
 
@@ -139,16 +137,11 @@ MariaDB Database
 ### Database
 
 - MariaDB
-- SQL schema with:
-  - primary keys,
-  - foreign keys,
-  - indexes,
-  - unique constraints,
-  - normalized reservation structure.
+- SQL schema with primary keys, foreign keys, indexes, unique constraints, and normalized reservation structure
 
 ### Development Tools
 
-- WebStorm or Visual Studio Code
+- WebStorm / Visual Studio Code
 - HeidiSQL / MariaDB client
 - Postman
 - Git
@@ -158,46 +151,47 @@ MariaDB Database
 
 ## System Architecture
 
-The application follows a three-tier architecture.
+The application follows a three-tier distributed architecture.
 
 ```text
-React Native Mobile Client
-        |
-        | HTTP/REST requests with JWT authentication
-        v
-Node.js / Express REST API
-        |
-        | SQL queries using mysql2
-        v
-MariaDB Database
+┌──────────────────────────────────────┐
+│ React Native / Expo Mobile Client    │
+│ - UI screens                         │
+│ - Auth context                       │
+│ - Axios API service                  │
+│ - Secure token handling              │
+└───────────────────┬──────────────────┘
+                    │ HTTP/REST + JWT
+                    v
+┌──────────────────────────────────────┐
+│ Node.js / Express REST API           │
+│ - Routes                             │
+│ - Controllers                        │
+│ - Services                           │
+│ - JWT middleware                     │
+│ - Error handling                     │
+└───────────────────┬──────────────────┘
+                    │ SQL queries via mysql2
+                    v
+┌──────────────────────────────────────┐
+│ MariaDB Database                     │
+│ - Users                              │
+│ - Theatres                           │
+│ - Shows / showtimes                  │
+│ - Seats / categories                 │
+│ - Reservations / reservation seats   │
+└──────────────────────────────────────┘
 ```
 
 ### Frontend Layer
 
-The frontend provides the mobile user interface for:
+The frontend provides the mobile user interface for registration, login, protected navigation, theatre browsing, search, show details, showtime preview, seat selection, reservation confirmation, user reservation history, future reservation editing, and future reservation cancellation.
 
-- registration,
-- login,
-- theatre and show browsing,
-- search,
-- showtime selection,
-- seat selection,
-- reservation confirmation,
-- user reservation history,
-- future reservation editing/cancellation.
+The UI is mobile-first. When tested through Expo web, the main content is constrained with a clean card layout so the app still looks professional on a desktop screen while preserving the mobile application design.
 
 ### Backend Layer
 
-The backend exposes REST API endpoints and handles:
-
-- request validation,
-- authentication,
-- JWT verification,
-- business logic,
-- reservation rules,
-- transaction-based booking,
-- database queries,
-- error handling.
+The backend exposes REST API endpoints and handles request validation, user authentication, JWT verification, business logic, ownership checks, transaction-based booking, seat availability checks, database queries, and consistent JSON error handling.
 
 The backend is organised into:
 
@@ -210,21 +204,9 @@ db/
 utils/
 ```
 
-This separation supports clean architecture and directly aligns with the backend architecture criterion of the coursework.
-
 ### Database Layer
 
-The MariaDB database stores all core entities:
-
-- users,
-- theatres,
-- halls,
-- shows,
-- showtimes,
-- seat categories,
-- seats,
-- reservations,
-- reservation seats.
+The MariaDB database stores all core entities: users, theatres, halls, shows, showtimes, seat categories, seats, reservations, and reservation seats.
 
 ---
 
@@ -236,7 +218,6 @@ theatre-reservation-app/
 │  ├─ src/
 │  │  ├─ controllers/
 │  │  ├─ db/
-│  │  │  └─ pool.js
 │  │  ├─ middleware/
 │  │  ├─ routes/
 │  │  ├─ services/
@@ -249,12 +230,30 @@ theatre-reservation-app/
 ├─ frontend/
 │  ├─ src/
 │  │  ├─ components/
+│  │  │  ├─ AppButton.js
+│  │  │  ├─ AppInput.js
+│  │  │  ├─ FeedbackMessage.js
+│  │  │  └─ LoadingView.js
 │  │  ├─ context/
+│  │  │  └─ AuthContext.js
 │  │  ├─ navigation/
+│  │  │  └─ RootNavigator.js
 │  │  ├─ screens/
+│  │  │  ├─ WelcomeScreen.js
+│  │  │  ├─ RegisterScreen.js
+│  │  │  ├─ LoginScreen.js
+│  │  │  ├─ ShowsScreen.js
+│  │  │  ├─ ShowDetailsScreen.js
+│  │  │  ├─ SeatSelectionScreen.js
+│  │  │  └─ MyReservationsScreen.js
 │  │  ├─ services/
+│  │  │  └─ api.js
 │  │  └─ utils/
-│  └─ App.js
+│  │     └─ showFormatters.js
+│  ├─ App.js
+│  ├─ app.json
+│  ├─ package.json
+│  └─ package-lock.json
 │
 ├─ database/
 │  ├─ schema.sql
@@ -262,7 +261,6 @@ theatre-reservation-app/
 │
 ├─ docs/
 │  ├─ diagrams/
-│  │  └─ architecture-draft.md
 │  ├─ postman/
 │  ├─ screenshots/
 │  │  ├─ backend/
@@ -276,7 +274,7 @@ theatre-reservation-app/
 
 ## Database Design
 
-The database schema is designed around real theatre seat reservations.
+The database schema is designed around realistic theatre seat reservations.
 
 ### Main Tables
 
@@ -305,18 +303,16 @@ The database schema is designed around real theatre seat reservations.
 
 ### Seed Data
 
-The Day 1 seed data creates:
+The seed data creates realistic demo content for backend testing, frontend development, screenshots, and live presentation.
 
 | Entity | Count |
 |---|---:|
 | Theatres | 3 |
 | Halls | 6 |
 | Shows | 6 |
-| Showtimes | 7 |
+| Showtimes | Multiple future demo showtimes |
 | Seat categories | 3 |
 | Seats | 105 |
-
-This gives the project enough realistic demo data for backend testing, frontend development, screenshots, and live presentation.
 
 ---
 
@@ -332,7 +328,7 @@ UNIQUE KEY uq_showtime_seat (showtime_id, seat_id)
 
 This means that the same physical seat cannot be reserved twice for the same showtime.
 
-The backend also validates seat availability in the service layer before inserting a reservation. This gives the system two levels of protection:
+The backend also validates seat availability in the service layer before inserting or updating a reservation. This gives the system two levels of protection:
 
 1. **Application-level validation** in the backend service logic.
 2. **Database-level protection** through the unique constraint.
@@ -343,15 +339,13 @@ This is important for a distributed reservation system because two users may att
 
 Reservation creation and editing are handled using database transactions.
 
-When a user creates a reservation, the backend follows this process:
-
 ```text
 START TRANSACTION
 1. Validate that the selected showtime exists.
 2. Check that the showtime is not in the past.
 3. Validate that all selected seats belong to the correct hall.
 4. Check that the selected seats are still available.
-5. Insert the reservation record.
+5. Insert or update the reservation record.
 6. Insert the selected seats into reservation_seats.
 7. COMMIT
 ```
@@ -361,8 +355,6 @@ If any validation fails, the transaction is rolled back:
 ```text
 ROLLBACK
 ```
-
-This design improves data consistency and supports safe seat reservation handling in a distributed mobile application.
 
 ---
 
@@ -433,6 +425,26 @@ Content-Type: application/json
 }
 ```
 
+### Search Shows
+
+```http
+GET http://localhost:5000/shows?title=Hamlet
+GET http://localhost:5000/shows?location=Athens
+GET http://localhost:5000/shows?theatreName=National&date=2026-05-10
+```
+
+### Get Showtimes
+
+```http
+GET http://localhost:5000/showtimes?showId=1
+```
+
+### Get Seats
+
+```http
+GET http://localhost:5000/seats?showtimeId=1
+```
+
 ### Create Reservation
 
 ```http
@@ -463,6 +475,13 @@ Content-Type: application/json
 }
 ```
 
+### Cancel Future Reservation
+
+```http
+DELETE http://localhost:5000/reservations/1
+Authorization: Bearer <token>
+```
+
 ---
 
 ## Authentication and Security
@@ -484,7 +503,7 @@ PUT /reservations/:id
 DELETE /reservations/:id
 ```
 
-Security-related backend decisions:
+Security-related decisions:
 
 - Passwords are hashed using bcrypt before being stored.
 - Duplicate email registration is rejected.
@@ -493,8 +512,7 @@ Security-related backend decisions:
 - Past showtimes cannot be reserved.
 - Past reservations cannot be edited or cancelled.
 - Seat double-booking is prevented at both application and database level.
-
-The frontend will store the JWT token using Expo SecureStore.
+- The frontend authentication context attaches the JWT token automatically to protected API requests.
 
 ---
 
@@ -522,7 +540,7 @@ GET http://localhost:5000/health
 
 ---
 
-## Environment Variables
+## Backend Environment Variables
 
 Create a `.env` file inside the `backend/` folder:
 
@@ -578,28 +596,71 @@ GET http://localhost:5000/db-test
 
 ---
 
-## Planned Frontend Screens
+## How to Run the Frontend
 
-The React Native frontend will include:
+From the project root:
 
-- Welcome Screen
-- Register Screen
-- Login Screen
-- Shows Screen
-- Show Details Screen
-- Seat Selection Screen
-- Reservation Success Screen
-- My Reservations Screen
+```bash
+cd frontend
+npm install
+npx expo start
+```
 
-The frontend will provide loading states, success messages, error messages, empty states, and confirmation dialogs to improve the user experience.
+For web testing:
+
+```bash
+npx expo start --web
+```
+
+The Expo web preview may run on:
+
+```text
+http://localhost:8081
+```
+
+The frontend API base URL should point to the backend:
+
+```text
+http://localhost:5000
+```
+
+For Android emulator development, the backend URL may need to be:
+
+```text
+http://10.0.2.2:5000
+```
+
+For Expo Go on a physical device, use the computer's local network IP address:
+
+```text
+http://<PC-IP>:5000
+```
+
+---
+
+## Frontend Screens
+
+| Screen | Purpose |
+|---|---|
+| `WelcomeScreen` | Public landing page with app overview and navigation to register/login |
+| `RegisterScreen` | Account creation form with validation and feedback |
+| `LoginScreen` | Login form with JWT authentication flow |
+| `ShowsScreen` | Protected catalogue page with search filters and show cards |
+| `ShowDetailsScreen` | Show information and available showtimes preview |
+| `SeatSelectionScreen` | Showtime and seat selection for creating or editing reservations |
+| `MyReservationsScreen` | User reservation history with edit/cancel actions |
+
+The frontend provides loading states, success messages, error messages, empty states, confirmation dialogs, disabled buttons during invalid actions, and visual seat availability states.
 
 ---
 
 ## Testing Strategy
 
+### Backend Testing
+
 The backend has been tested using Postman.
 
-Important Day 2 backend test cases:
+Important backend test cases:
 
 - API health check
 - Database connection check
@@ -617,7 +678,33 @@ Important Day 2 backend test cases:
 - Cancel future reservation
 - Reject protected requests without token
 
-The most important evidence screenshot is the double-booking rejection, because it demonstrates correct reservation consistency.
+### Frontend Testing
+
+The frontend has been tested through the full mobile booking workflow:
+
+```text
+1. Open Welcome screen
+2. Register validation
+3. Login
+4. Browse shows
+5. Search by show title
+6. Search with no results
+7. View show details
+8. Preview available showtimes
+9. Continue to seat selection
+10. Select showtime
+11. Select available seats
+12. Create reservation
+13. View reservation in My Reservations
+14. Edit future reservation
+15. Update selected seats
+16. Cancel future reservation
+17. Confirm that cancelled reservation remains in history
+18. Return to Theatre Shows
+19. Logout
+```
+
+This verifies frontend UI/UX, backend communication, user feedback states, and the complete reservation flow.
 
 ---
 
@@ -639,13 +726,6 @@ docs/screenshots/frontend/
 04_day1_reservation_seats_indexes.png
 ```
 
-These screenshots show:
-
-- successful API health check,
-- successful database connection,
-- seeded MariaDB tables,
-- `uq_showtime_seat` index for double-booking prevention.
-
 ### Day 2 Backend Evidence
 
 ```text
@@ -666,22 +746,26 @@ These screenshots show:
 15_no_token_unauthorized.png
 ```
 
-### Planned Frontend Evidence
+### Day 3 Frontend Evidence
 
 ```text
-01_welcome.png
-02_register.png
-03_login.png
-04_shows_list.png
-05_search_results.png
-06_search_empty_state.png
-07_show_details.png
-08_seat_selection.png
-09_reservation_success.png
-10_my_reservations.png
-11_edit_reservation.png
-12_delete_confirmation.png
+01_day3_welcome_screen.png
+02_day3_register_screen.png
+03_day3_login_screen.png
+04_day3_authenticated_shows_screen.png
+05_day3_shows_search_result.png
+06_day3_search_empty_state.png
+07_day3_show_details_showtimes_preview.png
+08_day3_seat_selection_multiple_showtimes.png
+09_day3_reservation_success_updated_availability.png
+10_day3_my_reservations_upcoming.png
+11_day3_edit_reservation_preselected_seats.png
+12_day3_edit_reservation_success.png
+13_day3_cancel_confirmation_dialog.png
+14_day3_cancelled_reservation_history.png
 ```
+
+These screenshots show the complete frontend flow required by the assignment.
 
 ---
 
@@ -721,32 +805,67 @@ These screenshots show:
 - [x] Double-booking rejection test
 - [x] Postman backend evidence screenshots
 
-### Day 3 — React Native Frontend
+### Day 3 — React Native Frontend and Backend Integration
 
-- [ ] Expo setup
-- [ ] Navigation
-- [ ] Authentication flow
-- [ ] Secure token storage
-- [ ] Shows list
-- [ ] Search
-- [ ] Show details
-- [ ] Seat selection
-- [ ] Reservation creation
-- [ ] My reservations
-- [ ] Edit/cancel reservation UI
+- [x] Expo frontend running
+- [x] React Navigation configured
+- [x] Authentication flow implemented
+- [x] Register connected to backend
+- [x] Login connected to backend
+- [x] JWT-based protected frontend flow
+- [x] Logout implemented
+- [x] Shows list loaded from backend
+- [x] Search by title, theatre, location, and date
+- [x] Show details screen implemented
+- [x] Showtimes preview displayed
+- [x] Seat selection screen implemented
+- [x] Seat availability displayed
+- [x] Selected seats highlighted
+- [x] Unavailable seats disabled
+- [x] Live total price calculation
+- [x] Reservation creation from mobile UI
+- [x] My Reservations screen implemented
+- [x] Edit future reservation flow implemented
+- [x] Cancel future reservation flow implemented
+- [x] Loading, success, error, empty, and confirmation states implemented
+- [x] Frontend screenshots captured
+- [x] README frontend section updated
 
 ### Day 4 — Final Submission Preparation
 
-- [ ] Final README
-- [ ] Architecture diagram
-- [ ] ERD
+- [ ] Final architecture diagram
+- [ ] Final ERD
 - [ ] Backend screenshots review
-- [ ] Frontend screenshots
+- [ ] Frontend screenshots review
 - [ ] PowerPoint presentation
 - [ ] Demo script
-- [ ] Final testing
-- [ ] Final GitHub push
+- [ ] Final regression testing
+- [ ] Final GitHub push before submission
 
+---
+
+## Suggested Demo Flow
+
+A strong live demo can follow this order:
+
+```text
+1. Open the Welcome screen.
+2. Register or log in.
+3. Show the theatre catalogue.
+4. Search for a show by title.
+5. Open Show Details.
+6. Point out available showtimes, halls, and starting prices.
+7. Continue to Seat Selection.
+8. Select a showtime and available seats.
+9. Create a reservation.
+10. Open My Reservations.
+11. Edit the future reservation.
+12. Cancel the reservation.
+13. Show that the cancelled reservation remains in history.
+14. Logout.
+```
+
+This demo covers the most important assessment areas: frontend UI/UX, backend communication, JWT authentication, database-backed reservations, and reservation management.
 
 ---
 

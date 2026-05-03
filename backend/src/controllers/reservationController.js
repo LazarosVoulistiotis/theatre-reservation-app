@@ -1,60 +1,72 @@
-// Handles protected reservation HTTP requests.
-// The authenticated user's identity is read from req.user, which is set by authMiddleware.
+// Handles HTTP requests for reservation operations.
+// Controllers remain thin: validation/business rules live inside the service layer.
 
 const reservationService = require("../services/reservationService");
 
-// Creates a reservation for the authenticated user.
+/*
+  Supports different auth middleware naming styles.
+
+  In our project the JWT middleware usually sets req.user.userId.
+  The fallbacks keep the controller stable if the middleware shape changes.
+*/
+function getAuthenticatedUserId(req) {
+    return req.user?.userId || req.user?.user_id || req.user?.id;
+}
+
 async function createReservation(req, res) {
-    const reservation = await reservationService.createReservation(
-        req.user.userId,
-        req.body
-    );
+    const userId = getAuthenticatedUserId(req);
+
+    const result = await reservationService.createReservation(userId, req.body);
 
     res.status(201).json({
         message: "Reservation created successfully.",
-        reservation
+        ...result,
     });
 }
 
-// Returns only the reservations that belong to the authenticated user.
 async function getUserReservations(req, res) {
-    const reservations = await reservationService.getUserReservations(req.user.userId);
+    const userId = getAuthenticatedUserId(req);
 
-    res.json({
-        reservations
-    });
+    const result = await reservationService.getUserReservations(userId);
+
+    res.status(200).json(result);
 }
 
-// Updates a future reservation owned by the authenticated user.
 async function updateReservation(req, res) {
-    const reservation = await reservationService.updateReservation(
-        req.user.userId,
-        req.params.id,
+    const userId = getAuthenticatedUserId(req);
+    const { reservationId } = req.params;
+
+    const result = await reservationService.updateReservation(
+        userId,
+        reservationId,
         req.body
     );
 
-    res.json({
+    res.status(200).json({
         message: "Reservation updated successfully.",
-        reservation
+        ...result,
     });
 }
 
-// Cancels a future reservation owned by the authenticated user.
 async function cancelReservation(req, res) {
-    const reservation = await reservationService.cancelReservation(
-        req.user.userId,
-        req.params.id
+    const userId = getAuthenticatedUserId(req);
+    const { reservationId } = req.params;
+
+    const result = await reservationService.cancelReservation(
+        userId,
+        reservationId
     );
 
-    res.json({
-        message: "Reservation cancelled successfully.",
-        reservation
-    });
+    res.status(200).json(result);
 }
 
 module.exports = {
     createReservation,
     getUserReservations,
     updateReservation,
-    cancelReservation
+    cancelReservation,
+
+    // Compatibility aliases.
+    getReservationsByUser: getUserReservations,
+    deleteReservation: cancelReservation,
 };

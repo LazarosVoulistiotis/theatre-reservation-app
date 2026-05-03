@@ -1,0 +1,15 @@
+{
+  "expo": {
+    "name": "Theatre Reservation App",
+    "slug": "theatre-reservation-app",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "plugins": [
+      "expo-secure-store"
+    ],
+    "web": {
+      "bundler": "metro"
+    }
+  }
+}
