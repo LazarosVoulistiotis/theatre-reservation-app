@@ -2,28 +2,29 @@
 
 A three-tier mobile distributed system for booking specific seats in theatre performances.
 
-This project is developed for **CN6035 — Mobile & Distributed Systems**. It demonstrates a distributed architecture where a **React Native / Expo mobile client** communicates with a **Node.js / Express REST API**, which stores and retrieves data from a **MariaDB relational database**.
+This project was developed for **CN6035 — Mobile & Distributed Systems**. It demonstrates a distributed architecture in which a **React Native / Expo mobile client** communicates with a **Node.js / Express REST API**, which stores and retrieves data from a **MariaDB relational database**.
 
 ---
 
 ## Project Overview
 
-The **Theatre Reservation App** allows users to browse theatre performances, view available showtimes, select specific seats, and manage their reservations through a mobile-first application.
+The **Theatre Reservation App** allows users to browse theatre performances, view available showtimes, select specific seats, and manage their own reservations through a mobile-first application.
 
-The system implements a realistic theatre booking workflow:
+The application supports a realistic theatre booking workflow:
 
-- users register and log in securely,
-- users browse available theatres and performances,
-- users search by show title, theatre name, location, and show date,
-- users view show details and available showtimes,
-- users view seat availability for a selected showtime,
-- users select one or more specific seats,
-- users create reservations,
-- users view their own reservation history,
-- users edit future reservations,
-- users cancel future reservations.
+- user registration and login,
+- JWT-protected access to reservation features,
+- browsing of available theatres and performances,
+- search by show title, theatre name, location, and show date,
+- show details with available dates, times, halls, and prices,
+- seat availability per selected showtime,
+- creation of reservations for one or more specific seats,
+- user reservation history,
+- editing of future reservations,
+- cancellation of future reservations,
+- retention of cancelled reservations in the user history.
 
-The main technical focus is not only basic CRUD functionality, but also **JWT-protected access**, **secure token handling**, **seat availability management**, **reservation consistency**, and **double-booking prevention**.
+The main technical focus is not only basic CRUD functionality. The project also demonstrates **JWT authentication**, **secure frontend token persistence**, **seat-level availability**, **transaction-based reservation logic**, **double-booking prevention**, and **data consistency across a distributed mobile-client/API/database system**.
 
 ---
 
@@ -33,18 +34,18 @@ The project is aligned with the CN6035 coursework requirements and assessment cr
 
 | Assessment Area | Weight | Project Evidence |
 |---|---:|---|
-| Frontend | 30% | React Native / Expo mobile client with consistent UI, authentication flow, protected navigation, backend communication, search, show details, showtime preview, seat selection, reservation creation, edit/cancel reservation flow, and user feedback states |
+| Frontend | 30% | React Native / Expo frontend with consistent UI, authentication flow, protected navigation, backend communication, search, show details, showtime preview, seat selection, reservation creation, edit/cancel flow, and user feedback states |
 | Backend | 20% | Node.js / Express REST API with routes, controllers, services, middleware, JWT authentication, validation, transaction-based reservation logic, and MariaDB integration |
-| Database | 20% | MariaDB schema with normalized tables, primary keys, foreign keys, indexes, constraints, seed data, and reservation-seat relationship for consistency |
-| Presentation | 30% | README, architecture evidence, backend/frontend screenshots, Postman evidence, PowerPoint, and live demo flow |
+| Database | 20% | MariaDB schema with normalized tables, primary keys, foreign keys, indexes, unique constraints, seed data, and reservation-seat relationship for consistency |
+| Presentation | 30% | README documentation, architecture evidence, backend/frontend screenshots, Postman evidence, PowerPoint slides, and live demo flow |
 
-The project follows the required distributed system model:
+The implemented system follows the required distributed model:
 
 ```text
 React Native / Expo Mobile Client
-        ↓
+        ↓ HTTP/REST + JWT
 Node.js / Express REST API
-        ↓
+        ↓ SQL queries
 MariaDB Database
 ```
 
@@ -59,7 +60,7 @@ MariaDB Database
 - Password hashing with bcrypt on the backend
 - JWT-based authentication for protected routes
 - Protected frontend navigation after login
-- Secure frontend token handling through the authentication context
+- Token persistence through the frontend authentication context and secure storage flow
 - Logout functionality
 - User feedback for validation, success, and error cases
 
@@ -77,7 +78,7 @@ MariaDB Database
 - Display of title, theatre, location, description, duration, and age rating
 - Preview of available showtimes before seat selection
 - Display of showtime date/time, hall name, and starting price
-- Direct navigation to the complete seat selection flow
+- Navigation from show details to the complete seat selection workflow
 
 ### Seat Selection and Reservation Creation
 
@@ -107,7 +108,8 @@ MariaDB Database
 - Seat availability checked before reservation creation and editing
 - Backend transaction logic protects reservation operations
 - Database-level unique constraint prevents the same seat from being confirmed twice for the same showtime
-- Cancelled reservations release seats because availability checks only consider confirmed reservations
+- Duplicate database insert attempts are converted into user-friendly conflict responses
+- Cancelled reservations keep their history record while releasing their linked seats for future bookings
 
 ---
 
@@ -139,7 +141,7 @@ MariaDB Database
 - MariaDB
 - SQL schema with primary keys, foreign keys, indexes, unique constraints, and normalized reservation structure
 
-### Development Tools
+### Development and Testing Tools
 
 - WebStorm / Visual Studio Code
 - HeidiSQL / MariaDB client
@@ -177,10 +179,24 @@ The application follows a three-tier distributed architecture.
 │ MariaDB Database                     │
 │ - Users                              │
 │ - Theatres                           │
+│ - Halls                              │
 │ - Shows / showtimes                  │
 │ - Seats / categories                 │
 │ - Reservations / reservation seats   │
 └──────────────────────────────────────┘
+```
+
+Supporting diagrams are stored in:
+
+```text
+docs/diagrams/
+```
+
+Recommended exported diagram files for the final submission package:
+
+```text
+docs/diagrams/architecture_diagram.png
+docs/diagrams/database_erd.png
 ```
 
 ### Frontend Layer
@@ -288,7 +304,7 @@ The database schema is designed around realistic theatre seat reservations.
 | `seat_categories` | Stores Standard, Premium, and VIP seat categories |
 | `seats` | Stores physical seats per hall |
 | `reservations` | Stores reservation records |
-| `reservation_seats` | Stores selected seats for each reservation |
+| `reservation_seats` | Stores active selected seats for confirmed reservations |
 
 ### Key Relationships
 
@@ -299,7 +315,7 @@ The database schema is designed around realistic theatre seat reservations.
 - One reservation belongs to one user.
 - One reservation belongs to one showtime.
 - One reservation can contain one or more selected seats.
-- One selected seat belongs to one reservation and one showtime.
+- Active selected seats are linked to reservations through `reservation_seats`.
 
 ### Seed Data
 
@@ -320,34 +336,55 @@ The seed data creates realistic demo content for backend testing, frontend devel
 
 A key design decision is the use of a dedicated `reservation_seats` table.
 
-This table links a reservation with the selected seats and includes a database-level unique constraint:
+This table links a confirmed reservation with its selected seats and includes a database-level unique constraint:
 
 ```sql
 UNIQUE KEY uq_showtime_seat (showtime_id, seat_id)
 ```
 
-This means that the same physical seat cannot be reserved twice for the same showtime.
+This means that the same physical seat cannot be inserted twice for the same showtime.
 
-The backend also validates seat availability in the service layer before inserting or updating a reservation. This gives the system two levels of protection:
+### How Seat Availability Is Loaded
 
-1. **Application-level validation** in the backend service logic.
-2. **Database-level protection** through the unique constraint.
+When the frontend opens the seat selection screen, it requests seat availability for a selected showtime:
 
-This is important for a distributed reservation system because two users may attempt to reserve the same seat at nearly the same time. The database constraint acts as the final consistency safeguard.
+```http
+GET /seats?showtimeId=<id>
+```
 
-### Backend Transaction Logic
+The backend returns all seats for the relevant hall and marks each one as available or unavailable. A seat is unavailable when it is linked to a **confirmed** reservation for the same showtime.
 
-Reservation creation and editing are handled using database transactions.
+The frontend then displays:
+
+- available seats as selectable,
+- unavailable seats as disabled,
+- selected seats with a separate visual state,
+- total price calculated from the selected seat prices.
+
+### Application-Level Validation
+
+Before a reservation is created or updated, the backend validates that:
+
+1. the showtime exists,
+2. the showtime is in the future,
+3. all selected seats belong to the correct hall,
+4. the selected seats are not already linked to another confirmed reservation,
+5. the authenticated user is allowed to manage the reservation.
+
+This prevents most invalid reservation attempts before the database insert/update is executed.
+
+### Transaction-Based Reservation Logic
+
+Reservation creation and editing are handled inside database transactions.
 
 ```text
 START TRANSACTION
-1. Validate that the selected showtime exists.
-2. Check that the showtime is not in the past.
-3. Validate that all selected seats belong to the correct hall.
-4. Check that the selected seats are still available.
-5. Insert or update the reservation record.
-6. Insert the selected seats into reservation_seats.
-7. COMMIT
+1. Lock and validate the selected showtime.
+2. Validate the selected seats for the showtime hall.
+3. Check current seat availability.
+4. Insert or update the reservation record.
+5. Insert the selected seats into reservation_seats.
+6. Commit the transaction.
 ```
 
 If any validation fails, the transaction is rolled back:
@@ -355,6 +392,41 @@ If any validation fails, the transaction is rolled back:
 ```text
 ROLLBACK
 ```
+
+This is important in a distributed system because the mobile client, API server, and database operate as separate tiers. Two users may attempt to reserve the same seat at almost the same time. Application-level validation reduces invalid requests, while the database unique constraint acts as the final consistency safeguard.
+
+### Database-Level Protection
+
+Even if two requests pass the application-level check at nearly the same time, the database still prevents the same `(showtime_id, seat_id)` pair from being inserted twice.
+
+If a duplicate insert is attempted, the backend returns a user-friendly conflict response:
+
+```json
+{
+  "message": "Selected seat is no longer available."
+}
+```
+
+This makes the system safer under concurrent booking attempts.
+
+### Cancellation and Seat Release Behaviour
+
+Future reservations are cancelled using a soft-cancellation approach:
+
+- the reservation record remains in the `reservations` table,
+- its status changes from `confirmed` to `cancelled`,
+- the linked rows are removed from `reservation_seats`.
+
+This design keeps the cancelled reservation visible in the user's history while releasing the selected seats for future bookings.
+
+In other words:
+
+```text
+Confirmed reservation  -> keeps reservation_seats rows -> seats unavailable
+Cancelled reservation  -> removes reservation_seats rows -> seats available again
+```
+
+This behaviour was verified during Day 4 regression testing. The final backend test confirms that a reservation can be created, edited, cancelled, and that the edited seat becomes available again after cancellation.
 
 ---
 
@@ -390,7 +462,7 @@ ROLLBACK
 | POST | `/reservations` | Creates a new reservation with selected seats | Protected |
 | GET | `/user/reservations` | Returns reservations for the logged-in user | Protected |
 | PUT | `/reservations/:id` | Updates a future reservation | Protected |
-| DELETE | `/reservations/:id` | Cancels a future reservation | Protected |
+| DELETE | `/reservations/:id` | Cancels a future reservation and releases its seats | Protected |
 
 ---
 
@@ -658,7 +730,7 @@ The frontend provides loading states, success messages, error messages, empty st
 
 ### Backend Testing
 
-The backend has been tested using Postman.
+The backend has been tested using Postman and Day 4 regression testing.
 
 Important backend test cases:
 
@@ -667,6 +739,8 @@ Important backend test cases:
 - Register user
 - Reject duplicate email
 - Login user
+- Reject invalid login
+- Reject protected requests without token
 - Fetch theatres
 - Fetch shows/search results
 - Fetch showtimes
@@ -676,7 +750,7 @@ Important backend test cases:
 - Fetch user reservations
 - Edit future reservation
 - Cancel future reservation
-- Reject protected requests without token
+- Verify that cancelled reservation releases its edited seat
 
 ### Frontend Testing
 
@@ -688,7 +762,7 @@ The frontend has been tested through the full mobile booking workflow:
 3. Login
 4. Browse shows
 5. Search by show title
-6. Search with no results
+6. Search by location/theatre
 7. View show details
 8. Preview available showtimes
 9. Continue to seat selection
@@ -765,7 +839,15 @@ docs/screenshots/frontend/
 14_day3_cancelled_reservation_history.png
 ```
 
-These screenshots show the complete frontend flow required by the assignment.
+### Day 4 Final Regression Evidence
+
+```text
+backend/16_day4_backend_regression_pass.png
+frontend/15_day4_frontend_reservation_flow_pass.png
+frontend/16_day4_frontend_cancelled_history_pass.png
+```
+
+Day 4 evidence confirms that the final backend and frontend flows were regression-tested after polishing the cancellation and seat-release behaviour.
 
 ---
 
@@ -833,18 +915,45 @@ These screenshots show the complete frontend flow required by the assignment.
 
 ### Day 4 — Final Submission Preparation
 
+- [x] Backend regression testing passed
+- [x] Frontend visual regression testing passed
+- [x] Cancellation and seat-release behaviour verified
+- [x] Final README polish completed
+- [x] Backend final evidence screenshot captured
+- [x] Frontend final evidence screenshots captured
 - [ ] Final architecture diagram
-- [ ] Final ERD
-- [ ] Backend screenshots review
-- [ ] Frontend screenshots review
+- [ ] Final database ERD
 - [ ] PowerPoint presentation
 - [ ] Demo script
-- [ ] Final regression testing
 - [ ] Final GitHub push before submission
 
 ---
 
-## Suggested Demo Flow
+## Known Limitations
+
+- The project uses a coursework-focused JWT authentication flow rather than a full external OpenID Connect provider.
+- The frontend is tested mainly through Expo web/mobile preview rather than a production app store build.
+- The system does not include online payment processing.
+- The application currently uses seeded theatre/showtime data rather than an admin panel for managing performances.
+- Cancelled reservations remain visible for history, but their active seat links are removed so those seats can be booked again.
+- Real-time live seat updates through WebSockets are not implemented; seat availability is refreshed through API requests.
+
+---
+
+## Future Improvements
+
+- Add an administrator dashboard for theatres, halls, shows, showtimes, and seat management.
+- Add refresh tokens or an external identity provider for a more production-like authentication model.
+- Add payment simulation or payment gateway integration.
+- Add email confirmation after successful booking or cancellation.
+- Add QR-code tickets for confirmed reservations.
+- Add WebSocket-based real-time seat availability updates.
+- Add automated unit/integration tests for backend services and frontend screens.
+- Add Docker configuration for easier deployment.
+
+---
+
+## Suggested Live Demo Flow
 
 A strong live demo can follow this order:
 
@@ -853,19 +962,21 @@ A strong live demo can follow this order:
 2. Register or log in.
 3. Show the theatre catalogue.
 4. Search for a show by title.
-5. Open Show Details.
-6. Point out available showtimes, halls, and starting prices.
-7. Continue to Seat Selection.
-8. Select a showtime and available seats.
-9. Create a reservation.
-10. Open My Reservations.
-11. Edit the future reservation.
-12. Cancel the reservation.
-13. Show that the cancelled reservation remains in history.
-14. Logout.
+5. Search by location/theatre.
+6. Open Show Details.
+7. Point out available showtimes, halls, and starting prices.
+8. Continue to Seat Selection.
+9. Select a showtime and available seats.
+10. Create a reservation.
+11. Open My Reservations.
+12. Edit the future reservation.
+13. Cancel the reservation.
+14. Show that the cancelled reservation remains in history.
+15. Explain that cancellation releases the linked seats for future bookings.
+16. Logout.
 ```
 
-This demo covers the most important assessment areas: frontend UI/UX, backend communication, JWT authentication, database-backed reservations, and reservation management.
+This demo covers the most important assessment areas: frontend UI/UX, backend communication, JWT authentication, database-backed reservations, reservation management, and double-booking prevention.
 
 ---
 

@@ -51,6 +51,21 @@ function normalizePositiveInteger(value, errorMessage) {
 }
 
 /*
+  Converts a database duplicate-key error into a user-friendly reservation error.
+
+  The database unique constraint is the final safety net against double booking.
+  If two requests reach the database at nearly the same time, the second insert
+  may still fail even after application-level validation.
+*/
+function throwFriendlyReservationError(error) {
+    if (error?.code === "ER_DUP_ENTRY" || error?.errno === 1062) {
+        throw createHttpError(409, "Selected seat is no longer available.");
+    }
+
+    throw error;
+}
+
+/*
   Locks and validates the selected showtime.
 
   FOR UPDATE is used because seat availability is checked and reservation rows
@@ -268,7 +283,7 @@ async function createReservation(userId, payload) {
         };
     } catch (error) {
         await connection.rollback();
-        throw error;
+        throwFriendlyReservationError(error);
     } finally {
         connection.release();
     }
@@ -415,9 +430,9 @@ async function updateReservation(userId, reservationId, payload) {
                     st.show_time,
                     TIMESTAMP(st.show_date, st.show_time) AS show_datetime
                 FROM reservations r
-                JOIN showtimes st ON r.showtime_id = st.showtime_id
+                    JOIN showtimes st ON r.showtime_id = st.showtime_id
                 WHERE r.reservation_id = ?
-                FOR UPDATE
+                    FOR UPDATE
             `,
             [normalizedReservationId]
         );
@@ -518,7 +533,7 @@ async function updateReservation(userId, reservationId, payload) {
         };
     } catch (error) {
         await connection.rollback();
-        throw error;
+        throwFriendlyReservationError(error);
     } finally {
         connection.release();
     }
@@ -527,8 +542,9 @@ async function updateReservation(userId, reservationId, payload) {
 /*
   Cancels a future reservation owned by the authenticated user.
 
-  The reservation is not physically deleted. It is marked as cancelled so the
-  project keeps history/audit data while freeing the seats for future bookings.
+  The reservation record is kept as cancelled for history/audit purposes.
+  The linked reservation_seats rows are removed so the selected seats are
+  genuinely released and can be booked again for the same showtime.
 */
 async function cancelReservation(userId, reservationId) {
     const normalizedUserId = normalizePositiveInteger(
@@ -589,6 +605,22 @@ async function cancelReservation(userId, reservationId) {
                 "Past reservations cannot be cancelled."
             );
         }
+
+        /*
+          Release the seats before marking the reservation as cancelled.
+
+          This keeps the reservation record for history, but removes the active
+          seat locks from reservation_seats. Without this step, the database
+          unique constraint on (showtime_id, seat_id) would continue blocking
+          future bookings even though the reservation is no longer confirmed.
+        */
+        await connection.query(
+            `
+                DELETE FROM reservation_seats
+                WHERE reservation_id = ?
+            `,
+            [normalizedReservationId]
+        );
 
         await connection.query(
             `

@@ -1,0 +1,44 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36" version="29.6.6">
+  <diagram name="Page-1" id="w0ZzUzeqK56y3nispf7O">
+    <mxGraphModel dx="752" dy="672" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" background="#ffffff" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="nVI_3izJqUy5dmKo7AKC-1" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="&lt;div&gt;&lt;b&gt;&lt;font style=&quot;font-size: 24px;&quot;&gt;Theatre Reservation App&lt;/font&gt;&lt;/b&gt;&lt;/div&gt;&lt;div&gt;&lt;b&gt;&lt;font size=&quot;3&quot;&gt;Three-Tier Distributed Architecture&lt;/font&gt;&lt;/b&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="90" width="300" x="362.5" y="20" as="geometry" />
+        </mxCell>
+        <mxCell id="nVI_3izJqUy5dmKo7AKC-5" edge="1" parent="1" source="nVI_3izJqUy5dmKo7AKC-2" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="nVI_3izJqUy5dmKo7AKC-3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="nVI_3izJqUy5dmKo7AKC-6" connectable="0" parent="nVI_3izJqUy5dmKo7AKC-5" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="&lt;div&gt;HTTP/REST Requests&lt;/div&gt;&lt;div&gt;Authorization: Bearer JWT&lt;/div&gt;" vertex="1">
+          <mxGeometry relative="1" x="-0.0652" y="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="nVI_3izJqUy5dmKo7AKC-2" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#0050ef;fontColor=#ffffff;strokeColor=#001DBC;labelBorderColor=light-dark(#000000,#000000);" value="&lt;span style=&quot;background-color: light-dark(rgb(255, 255, 255), transparent);&quot;&gt;&lt;b style=&quot;&quot;&gt;&lt;font style=&quot;font-size: 14px;&quot;&gt;React Native / Expo Mobile Client&lt;br&gt;&lt;/font&gt;&lt;/b&gt;&lt;br&gt;Welcome, Register, Login&lt;/span&gt;&lt;div&gt;&lt;span style=&quot;background-color: light-dark(rgb(255, 255, 255), transparent);&quot;&gt;Shows List and Search&lt;/span&gt;&lt;div&gt;&lt;span style=&quot;background-color: light-dark(rgb(255, 255, 255), transparent);&quot;&gt;Show Details and Showtimes&lt;/span&gt;&lt;div&gt;&lt;span style=&quot;background-color: light-dark(rgb(255, 255, 255), transparent); color: light-dark(rgb(255, 255, 255), rgb(18, 18, 18));&quot;&gt;Seat Selection&lt;/span&gt;&lt;div&gt;&lt;div&gt;&lt;span style=&quot;background-color: light-dark(rgb(255, 255, 255), transparent);&quot;&gt;&amp;nbsp;My Reservations&lt;br&gt;Auth Context / SecureStore&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="180" width="260" x="382.5" y="130" as="geometry" />
+        </mxCell>
+        <mxCell id="nVI_3izJqUy5dmKo7AKC-7" edge="1" parent="1" source="nVI_3izJqUy5dmKo7AKC-3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" target="nVI_3izJqUy5dmKo7AKC-4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="nVI_3izJqUy5dmKo7AKC-8" connectable="0" parent="nVI_3izJqUy5dmKo7AKC-7" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="&lt;div&gt;SQL queries via mysql2&lt;/div&gt;&lt;div&gt;Transactions + Constraints&lt;/div&gt;" vertex="1">
+          <mxGeometry relative="1" x="-0.0499" y="-2" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="nVI_3izJqUy5dmKo7AKC-3" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#008a00;fontColor=#ffffff;strokeColor=#005700;labelBorderColor=light-dark(#000000,#000000);" value="&lt;div&gt;&lt;font style=&quot;font-size: 14px;&quot;&gt;&lt;b&gt;Node.js / Express REST API&lt;/b&gt;&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(255, 255, 255), rgb(18, 18, 18));&quot;&gt;&lt;br&gt;&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(255, 255, 255), rgb(18, 18, 18));&quot;&gt;Routes, Controllers, Services&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(255, 255, 255), rgb(18, 18, 18));&quot;&gt;JWT Authentication Middleware&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(255, 255, 255), rgb(18, 18, 18));&quot;&gt;Request Validation&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(255, 255, 255), rgb(18, 18, 18));&quot;&gt;Reservation Business Logic&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(255, 255, 255), rgb(18, 18, 18));&quot;&gt;Transaction-Based Seat Booking&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(255, 255, 255), rgb(18, 18, 18));&quot;&gt;JSON Error Handling&lt;/span&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="180" width="257.5" x="382.5" y="390" as="geometry" />
+        </mxCell>
+        <mxCell id="nVI_3izJqUy5dmKo7AKC-4" parent="1" style="rounded=1;fillColor=light-dark(#F5F5F5,#FFFF99);strokeColor=#56517e;fontColor=light-dark(#000000,#000000);whiteSpace=wrap;html=1;labelBorderColor=light-dark(#000000,#000000);" value="&lt;font style=&quot;font-size: 14px;&quot;&gt;MariaDB Database&lt;br&gt;&lt;/font&gt;&lt;br&gt;users&lt;br&gt;theatres, halls&lt;br&gt;shows, showtimes&lt;br&gt;seats, seat_categories&lt;br&gt;reservations&lt;br&gt;reservation_seats&lt;br&gt;UNIQUE(showtime_id, seat_id)" vertex="1">
+          <mxGeometry height="170" width="257" x="382.5" y="640" as="geometry" />
+        </mxCell>
+        <mxCell id="nVI_3izJqUy5dmKo7AKC-9" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="&lt;div&gt;&lt;b&gt;&lt;font style=&quot;font-size: 14px;&quot;&gt;Consistency Focus&lt;/font&gt;&lt;/b&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;&lt;br&gt;&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;Backend validates selected seats&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;Transactions protect reservation changes&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;Database unique constraint prevents double booking&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;Cancelled reservations release seats&lt;/span&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="160" width="300" x="680" y="130" as="geometry" />
+        </mxCell>
+        <mxCell id="nVI_3izJqUy5dmKo7AKC-10" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="&lt;div&gt;&lt;b&gt;&lt;font style=&quot;font-size: 14px;&quot;&gt;Security&lt;/font&gt;&lt;/b&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&amp;nbsp;bcrypt password hashing&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;JWT login token&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;Protected reservation routes&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;User ownership checks&lt;/span&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="130" width="180" x="130" y="155" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
