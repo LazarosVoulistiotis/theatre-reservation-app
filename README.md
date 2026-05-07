@@ -849,6 +849,18 @@ frontend/16_day4_frontend_cancelled_history_pass.png
 
 Day 4 evidence confirms that the final backend and frontend flows were regression-tested after polishing the cancellation and seat-release behaviour.
 
+### Presentation Evidence
+
+```text
+docs/diagrams/architecture_diagram.png
+docs/diagrams/database_erd.png
+docs/presentation/CN6035_2678447_Theatre_Reservation_Presentation.pptx
+docs/presentation/theatre_reservation_demo.mp4
+docs/presentation/demo_script.md
+```
+
+The presentation package includes architecture evidence, database design evidence, a 12-slide PowerPoint, an embedded demo video, and a supporting demo script.
+
 ---
 
 ## Implementation Status
@@ -921,11 +933,12 @@ Day 4 evidence confirms that the final backend and frontend flows were regressio
 - [x] Final README polish completed
 - [x] Backend final evidence screenshot captured
 - [x] Frontend final evidence screenshots captured
-- [ ] Final architecture diagram
-- [ ] Final database ERD
-- [ ] PowerPoint presentation
-- [ ] Demo script
-- [ ] Final GitHub push before submission
+- [x] Final architecture diagram completed and exported
+- [x] Final database ERD completed and exported
+- [x] PowerPoint presentation prepared
+- [x] Demo video recorded and embedded in the presentation
+- [x] Demo script completed
+- [x] Final GitHub commit and push completed before submission
 
 ---
 
