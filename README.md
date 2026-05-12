@@ -1,8 +1,61 @@
 # Theatre Reservation App
 
-A three-tier mobile distributed system for booking specific seats in theatre performances.
+**Three-tier mobile distributed system for theatre seat reservations.**
 
-This project was developed for **CN6035 — Mobile & Distributed Systems**. It demonstrates a distributed architecture in which a **React Native / Expo mobile client** communicates with a **Node.js / Express REST API**, which stores and retrieves data from a **MariaDB relational database**.
+This project was developed for **CN6035 — Mobile & Distributed Systems** as a complete, submission-ready mobile distributed application. It demonstrates a realistic theatre booking workflow in which a **React Native / Expo mobile client** communicates with a **Node.js / Express REST API**, which persists data in a **MariaDB relational database**.
+
+The project goes beyond a basic CRUD implementation by focusing on **JWT authentication**, **seat-level availability**, **transaction-based reservation logic**, **double-booking prevention**, **reservation editing and cancellation**, and **end-to-end evidence through screenshots, regression testing, PowerPoint slides, demo script, and video demonstration**.
+
+---
+
+## Final Submission Package
+
+| Evidence / Deliverable | Location |
+|---|---|
+| Final PowerPoint presentation | [`docs/presentation/CN6035_2678447_Theatre_Reservation_Presentation.pptx`](docs/presentation/CN6035_2678447_Theatre_Reservation_Presentation.pptx) |
+| Demo video | [`docs/presentation/theatre_reservation_demo.mp4`](docs/presentation/theatre_reservation_demo.mp4) |
+| Demo script | [`docs/presentation/demo_script.md`](docs/presentation/demo_script.md) |
+| Architecture diagram | [`docs/diagrams/architecture_diagram.png`](docs/diagrams/architecture_diagram.png) |
+| Database ERD | [`docs/diagrams/database_erd.png`](docs/diagrams/database_erd.png) |
+| Backend regression evidence | [`docs/screenshots/backend/16_day4_backend_regression_pass.png`](docs/screenshots/backend/16_day4_backend_regression_pass.png) |
+| Frontend reservation flow evidence | [`docs/screenshots/frontend/15_day4_frontend_reservation_flow_pass.png`](docs/screenshots/frontend/15_day4_frontend_reservation_flow_pass.png) |
+| Frontend cancelled history evidence | [`docs/screenshots/frontend/16_day4_frontend_cancelled_history_pass.png`](docs/screenshots/frontend/16_day4_frontend_cancelled_history_pass.png) |
+
+---
+
+## Demo Video
+
+The final demo video shows the complete working flow of the application:
+
+```text
+Login
+→ Browse shows
+→ Search
+→ Open show details
+→ Select showtime and seats
+→ Create reservation
+→ View My Reservations
+→ Edit reservation
+→ Cancel reservation
+→ Confirm cancelled reservation history
+```
+
+Watch or download the video from:
+
+[**Watch demo video — theatre_reservation_demo.mp4**](docs/presentation/theatre_reservation_demo.mp4)
+
+The video is also embedded in the final PowerPoint presentation and is supported by the demo script in `docs/presentation/demo_script.md`.
+
+---
+
+## Technical Highlights
+
+- **Three-tier distributed architecture:** React Native / Expo frontend, Express REST API, MariaDB database.
+- **Secure user access:** bcrypt password hashing, JWT authentication, protected routes, and ownership checks.
+- **Realistic seat booking:** users select specific seats, not only a number of tickets.
+- **Consistency-focused reservation logic:** backend validation, database transactions, and `UNIQUE(showtime_id, seat_id)`.
+- **Cancellation with seat release:** cancelled reservations remain visible in history while linked seats become available again.
+- **Professional evidence package:** final README, diagrams, screenshots, regression testing output, PowerPoint, demo video, and demo script.
 
 ---
 
@@ -37,7 +90,7 @@ The project is aligned with the CN6035 coursework requirements and assessment cr
 | Frontend | 30% | React Native / Expo frontend with consistent UI, authentication flow, protected navigation, backend communication, search, show details, showtime preview, seat selection, reservation creation, edit/cancel flow, and user feedback states |
 | Backend | 20% | Node.js / Express REST API with routes, controllers, services, middleware, JWT authentication, validation, transaction-based reservation logic, and MariaDB integration |
 | Database | 20% | MariaDB schema with normalized tables, primary keys, foreign keys, indexes, unique constraints, seed data, and reservation-seat relationship for consistency |
-| Presentation | 30% | README documentation, architecture evidence, backend/frontend screenshots, Postman evidence, PowerPoint slides, and live demo flow |
+| Presentation | 30% | README documentation, architecture evidence, backend/frontend screenshots, Postman evidence, PowerPoint slides, demo video, and live demo script |
 
 The implemented system follows the required distributed model:
 
@@ -199,6 +252,10 @@ docs/diagrams/architecture_diagram.png
 docs/diagrams/database_erd.png
 ```
 
+### Architecture Diagram
+
+![Theatre Reservation App architecture diagram](docs/diagrams/architecture_diagram.png)
+
 ### Frontend Layer
 
 The frontend provides the mobile user interface for registration, login, protected navigation, theatre browsing, search, show details, showtime preview, seat selection, reservation confirmation, user reservation history, future reservation editing, and future reservation cancellation.
@@ -290,7 +347,9 @@ theatre-reservation-app/
 
 ## Database Design
 
-The database schema is designed around realistic theatre seat reservations.
+The database schema is designed around realistic theatre seat reservations. The ERD documents how users, theatres, halls, shows, showtimes, seats, reservations, and reservation-seat links are connected.
+
+![Theatre Reservation App database ERD](docs/diagrams/database_erd.png)
 
 ### Main Tables
 
@@ -849,18 +908,6 @@ frontend/16_day4_frontend_cancelled_history_pass.png
 
 Day 4 evidence confirms that the final backend and frontend flows were regression-tested after polishing the cancellation and seat-release behaviour.
 
-### Presentation Evidence
-
-```text
-docs/diagrams/architecture_diagram.png
-docs/diagrams/database_erd.png
-docs/presentation/CN6035_2678447_Theatre_Reservation_Presentation.pptx
-docs/presentation/theatre_reservation_demo.mp4
-docs/presentation/demo_script.md
-```
-
-The presentation package includes architecture evidence, database design evidence, a 12-slide PowerPoint, an embedded demo video, and a supporting demo script.
-
 ---
 
 ## Implementation Status
@@ -996,3 +1043,12 @@ This demo covers the most important assessment areas: frontend UI/UX, backend co
 ## One-Sentence Project Pitch
 
 The Theatre Reservation App is a three-tier mobile distributed system that allows users to securely browse theatre performances, select available showtimes and seats, and manage their reservations through a React Native frontend, a Node.js / Express REST API, and a MariaDB database.
+
+
+---
+
+## Suggested GitHub Repository Description
+
+```text
+Three-tier mobile distributed system for theatre seat reservations, built with React Native, Node.js/Express and MariaDB. Supports JWT authentication, show search, showtimes, seat availability, reservation CRUD and double-booking prevention.
+```
